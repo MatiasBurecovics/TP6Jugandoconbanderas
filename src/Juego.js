@@ -7,6 +7,7 @@ function Juego() {
     const [flag, setFlag] = useState({});
     const [answer, setAnswer] = useState("");
     const [puntos, setPuntos] = useState(0);
+    const [timer, setTimer] = useState(15);
 
     useEffect(() => {
         axios.get('https://countriesnow.space/api/v0.1/countries/flag/images')
@@ -17,7 +18,26 @@ function Juego() {
             .catch((error) => {
                 console.log(error);
             });
+            const RestarTimer = setInterval(() => {
+                setTimer(timer => {
+                    if (timer === 0) {
+                        
+                        setFlag(ConseguirBandera(paises));
+                        console.log('¡Tiempo terminado!');
+                        return timer = 15;
+                    }
+                    return timer - 1;
+                    
+                });
+            }, 1000);
+            return () => clearInterval(RestarTimer);
     }, []);
+
+
+
+
+    
+
 
     const ConseguirBandera = (paises) => {
         const posicion = Math.floor(Math.random() * paises.length);
@@ -29,10 +49,10 @@ function Juego() {
     };
 
     const VerifyAnswer = () => {
-        console.log(typeof(answer));
+        console.log(typeof (answer));
         console.log(answer);
         if (answer.toLowerCase() === flag.nombre.toLowerCase()) {
-            setPuntos(puntos + 10);
+            setPuntos(puntos + 10 + timer);
             setAnswer("");
             setFlag(ConseguirBandera(paises));
         } else {
@@ -42,7 +62,7 @@ function Juego() {
 
     return (
         <div className='App'>
-            {console.log(paises[1])}
+
             <h3>¿Qué bandera es esta?</h3>
             <img alt='Bandera' src={flag.imagen} />
             <input
@@ -55,6 +75,7 @@ function Juego() {
             />
             <button onClick={VerifyAnswer}>Enviar</button>
             <p>Puntos: {puntos}</p>
+            <p>Tiempo: {timer}</p>
         </div>
     );
 }
